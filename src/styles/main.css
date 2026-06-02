@@ -1,0 +1,39 @@
+body {
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.6);
+  background-image: url("/images/TV apps.jpg");
+  background-blend-mode: darken;
+  background-size: cover;
+  background-attachment: fixed;
+}
+
+/* Home page */
+.search-box {
+  height: 94vh;
+}
+
+/* Result page */
+.result-box {
+  height: 94vh;
+}
+
+/* Fonts */
+.kanit-medium {
+  font-family: "Kanit", sans-serif;
+  font-weight: 500;
+  font-style: normal;
+}
+
+.kanit-medium-italic {
+  font-family: "Kanit", sans-serif;
+  font-weight: 500;
+  font-style: italic;
+}
+
+.roboto {
+  font-family: "Roboto", sans-serif;
+  font-optical-sizing: auto;
+  /* font-weight: <weight>; */
+  font-style: normal;
+  font-variation-settings: "wdth" 100;
+}

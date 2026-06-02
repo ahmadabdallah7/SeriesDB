@@ -1,0 +1,13 @@
+#register-btn {
+  background-color: #b14220;
+  border-color: #b42215;
+}
+
+#register-btn:hover {
+  background-color: #993314;
+  border-color: #e85c50;
+}
+
+.bigBox {
+  height: 70vh;
+}

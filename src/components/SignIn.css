@@ -1,0 +1,31 @@
+.card {
+  border-radius: 10px;
+}
+.card-body {
+  padding: 2rem;
+}
+.card-title {
+  margin-bottom: 1.5rem;
+}
+
+#login-btn {
+  background-color: #b14220;
+  border-color: #b42215;
+}
+
+#login-btn:hover {
+  background-color: #993314;
+  border-color: #e85c50;
+}
+
+.bigBox {
+  height: 70vh;
+}
+
+.register-button {
+  color: #b14220;
+}
+
+.register-button:hover {
+  color: #e85c50;
+}
