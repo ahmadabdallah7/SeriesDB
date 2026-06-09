@@ -1,16 +1,32 @@
-import React from "react";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import axios from "axios";
 
 // Contexts
 import { useSnackbar } from "../context/SnackbarContext";
 import { updateWatchlist } from "../context/WatchlistContext";
-import WatchlistContext from "../context/WatchlistContext";
 
 // Components
 import Navbar from "../components/Navbar";
 import ShowCard from "../components/ShowCard";
 import Box from "@mui/material/Box";
+
+// Types
+type show = {
+  show_id: number;
+  show_name: string;
+  status: string;
+  genres: string[];
+  rating: number;
+  summary: string;
+  image_url: string;
+};
+
+type WatchlistResponse = {
+  success: boolean;
+  watchlistList: show[];
+  successMsg?: string;
+  error?: string;
+};
 
 // The page
 function Watchlist() {
@@ -20,9 +36,12 @@ function Watchlist() {
 
   useEffect(() => {
     async function fetchWatchlist() {
-      const response = await axios.get("http://localhost:3000/watchlist/list", {
-        withCredentials: true,
-      });
+      const response = await axios.get<WatchlistResponse>(
+        "http://localhost:3000/watchlist/list",
+        {
+          withCredentials: true,
+        },
+      );
       const success = response.data.success;
 
       if (success) {
@@ -30,7 +49,7 @@ function Watchlist() {
         setWatchlistList(watchlistList);
       }
 
-      if (!success) {
+      if (!success && response.data.error) {
         showSnackbar(response.data.error, "error");
       }
     }
@@ -50,21 +69,23 @@ function Watchlist() {
           px: 3,
         }}
       >
-        {watchlistList.map((show) => {
-          return (
-            <ShowCard
-              key={show.show_id}
-              showId={show.show_id}
-              showName={show.show_name}
-              status={show.status}
-              genres={show.genres}
-              rating={show.rating}
-              summary={show.summary}
-              imageURL={show.image_url}
-              mode="watchlist"
-            />
-          );
-        })}
+        {watchlistList
+          ? watchlistList.map((show) => {
+              return (
+                <ShowCard
+                  key={show.show_id}
+                  showId={show.show_id}
+                  showName={show.show_name}
+                  status={show.status}
+                  genres={show.genres}
+                  rating={show.rating}
+                  summary={show.summary}
+                  imageURL={show.image_url}
+                  mode="watchlist"
+                />
+              );
+            })
+          : null}
       </Box>
     </div>
   );

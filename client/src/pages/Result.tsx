@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "react-router";
 import axios from "axios";
 
@@ -10,6 +10,21 @@ import SearchBar from "../components/SearchBar";
 import Navbar from "../components/Navbar";
 import ShowCard from "../components/ShowCard";
 
+// Types
+type ShowDataType = {
+  id: number;
+  name: string;
+  status: string;
+  genres: string[];
+  rating: {
+    average: number;
+  };
+  summary: string;
+  image: {
+    original: string;
+  };
+};
+
 // The page
 function Result() {
   const location = useLocation();
@@ -18,12 +33,12 @@ function Result() {
 
   const { showSnackbar } = useSnackbar();
 
-  const [showData, setShowData] = useState(null);
+  const [showData, setShowData] = useState<ShowDataType | null>(null);
 
   useEffect(() => {
     async function fetchShow() {
       try {
-        const response = await axios.get(
+        const response = await axios.get<ShowDataType>(
           "https://api.tvmaze.com/singlesearch/shows?q=" + query,
         );
 

@@ -1,13 +1,21 @@
-import React, { useState, useContext } from "react";
+import { useState } from "react";
 import { useNavigate, useLocation } from "react-router";
 import axios from "axios";
 
 // Contexts
-import AuthContext from "../context/AuthContext";
+import { useAuth } from "../context/AuthContext";
 import { useSnackbar } from "../context/SnackbarContext";
 
 // Styling
 import "./SignIn.css";
+
+// Types
+type AttemptData = {
+  success: boolean;
+  isAuthenticated: boolean;
+  successMsg?: string;
+  error?: string;
+};
 
 function SignIn() {
   const navigate = useNavigate();
@@ -17,29 +25,29 @@ function SignIn() {
 
   const { showSnackbar } = useSnackbar();
 
-  const { setIsLogged } = useContext(AuthContext);
+  const { setIsLogged } = useAuth();
 
   function handleRegister() {
     navigate("/register");
   }
 
   // States
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
 
-  function handleUsername(event) {
+  function handleUsername(event: React.ChangeEvent<HTMLInputElement>) {
     setUsername(event.target.value);
   }
 
-  function handlePassword(event) {
+  function handlePassword(event: React.ChangeEvent<HTMLInputElement>) {
     setPassword(event.target.value);
   }
 
   // Handling the login attempt
-  async function handleLogin(event) {
+  async function handleLogin(event: React.SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    const response = await axios.post(
+    const response = await axios.post<AttemptData>(
       "http://localhost:3000/login",
       {
         username: username,
@@ -56,7 +64,7 @@ function SignIn() {
       showSnackbar(response.data.error, "error");
     }
 
-    if (isAuthenticated) {
+    if (isAuthenticated && response.data.successMsg) {
       setIsLogged(true);
       showSnackbar(response.data.successMsg, "success");
 
@@ -100,7 +108,7 @@ function SignIn() {
                       id="password"
                       placeholder="Enter your password"
                       required
-                      minLength="6"
+                      minLength={6}
                       onChange={handlePassword}
                     />
                   </div>
@@ -114,13 +122,13 @@ function SignIn() {
                     </button>
                     <p className="text-center text-muted mt-4">
                       Don't have an account yet?{" "}
-                      <a
-                        href=""
-                        className="text-decoration-none register-button"
+                      <button
+                        type="button"
+                        className="text-decoration-none register-button px-0 border-0 bg-transparent"
                         onClick={handleRegister}
                       >
                         Register
-                      </a>
+                      </button>
                       .
                     </p>
                     <div id="formFeedback" className="mt-3"></div>

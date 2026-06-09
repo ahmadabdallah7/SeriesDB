@@ -22,7 +22,7 @@ const db = new pg.Client({
   database: process.env.DATABASE,
   host: process.env.HOST,
   password: process.env.PASSWORD,
-  port: process.env.PORT,
+  port: Number(process.env.PORT),
 });
 db.connect();
 
@@ -41,7 +41,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Session setup
 app.use(
   session({
-    secret: process.env.SESSION_SECRET,
+    secret: process.env.SESSION_SECRET!,
     resave: false,
     saveUninitialized: true,
     cookie: {
@@ -127,6 +127,7 @@ app.post("/login", (req, res, next) => {
           console.log(err);
           return res.json({
             success: false,
+            isAuthenticated: req.isAuthenticated(),
             error: "Logging in failed.",
           });
         } else {
@@ -157,6 +158,7 @@ app.post("/logout", (req, res) => {
       if (err) {
         return res.json({
           success: false,
+          isAuthenticated: req.isAuthenticated(),
           error: "Error destroying the session.",
         });
       }

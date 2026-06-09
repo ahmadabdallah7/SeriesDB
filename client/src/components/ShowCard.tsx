@@ -1,28 +1,23 @@
-import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router";
 import axios from "axios";
 
 // Authentication context
-import AuthContext from "../context/AuthContext";
+import { useAuth } from "../context/AuthContext";
 
 // Snackbar context
 import { useSnackbar } from "../context/SnackbarContext";
 
 // Favorites context
 import { updateFavorites } from "../context/FavoritesContext";
-import FavoritesContext from "../context/FavoritesContext";
 
 // Watched list context
 import { updateWatched } from "../context/WatchedContext";
-import WatchedContext from "../context/WatchedContext";
 
 // Watching list context
 import { updateWatching } from "../context/WatchingContext";
-import WatchingContext from "../context/WatchingContext";
 
 // Watchlist context
 import { updateWatchlist } from "../context/WatchlistContext";
-import WatchlistContext from "../context/WatchlistContext";
 
 // Styling
 import "./ShowCard.css";
@@ -38,13 +33,25 @@ import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 // Components
 import Tooltip from "@mui/material/Tooltip";
 
-function ShowCard(props) {
+// Types
+type ShowCardProps = {
+  showId: number;
+  showName: string;
+  status: string;
+  genres: string[];
+  rating: number;
+  summary: string;
+  imageURL: string;
+  mode?: "result" | "favorites" | "watched" | "watching" | "watchlist";
+};
+
+function ShowCard(props: ShowCardProps) {
   const navigate = useNavigate();
 
   // States
   const { showSnackbar } = useSnackbar();
 
-  const { isLogged, setIsLogged } = useContext(AuthContext);
+  const { isLogged } = useAuth();
 
   const { favoritesList, setFavoritesList } = updateFavorites();
 
@@ -256,7 +263,7 @@ function ShowCard(props) {
     }
   }
 
-  async function removeFromWatching(original) {
+  async function removeFromWatching(showMessage: boolean = true) {
     const response = await axios.post(
       "http://localhost:3000/watching/remove",
       {
@@ -273,7 +280,7 @@ function ShowCard(props) {
     if (success) {
       const newWatchingList = response.data.watchingList;
       setWatchingList(newWatchingList);
-      if (original !== false) {
+      if (showMessage) {
         showSnackbar(response.data.successMsg, "success");
       }
     }
@@ -325,7 +332,7 @@ function ShowCard(props) {
     }
   }
 
-  async function removeFromWatchlist(original) {
+  async function removeFromWatchlist(showMessage: boolean = true) {
     const response = await axios.post(
       "http://localhost:3000/watchlist/remove",
       {
@@ -342,7 +349,7 @@ function ShowCard(props) {
     if (success) {
       const newWatchlistList = response.data.watchlistList;
       setWatchlistList(newWatchlistList);
-      if (original !== false) {
+      if (showMessage) {
         showSnackbar(response.data.successMsg, "success");
       }
     }
@@ -702,7 +709,7 @@ function ShowCard(props) {
           <button
             type="submit"
             className="btn btn-submit custom ms-1 text-white"
-            onClick={removeFromWatching}
+            onClick={() => removeFromWatching()}
           >
             <VisibilityOffIcon fontSize="small" />
           </button>
@@ -761,7 +768,7 @@ function ShowCard(props) {
             <button
               type="submit"
               className="btn btn-submit custom ms-1 text-white"
-              onClick={removeFromWatching}
+              onClick={() => removeFromWatching()}
             >
               <VisibilityOffIcon fontSize="small" />
             </button>
@@ -806,7 +813,7 @@ function ShowCard(props) {
           <button
             type="submit"
             className="btn btn-submit custom ms-1 text-white"
-            onClick={removeFromWatchlist}
+            onClick={() => removeFromWatchlist()}
           >
             <RemoveIcon fontSize="small" />
           </button>
@@ -865,7 +872,7 @@ function ShowCard(props) {
             <button
               type="submit"
               className="btn btn-submit custom ms-1 text-white"
-              onClick={removeFromWatchlist}
+              onClick={() => removeFromWatchlist()}
             >
               <RemoveIcon fontSize="small" />
             </button>

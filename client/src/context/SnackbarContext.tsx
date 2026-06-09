@@ -4,16 +4,34 @@ import { createContext, useContext, useState } from "react";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 
-const SnackbarContext = createContext();
+// Types
+type SnackbarState = {
+  open: boolean;
+  message: string;
+  severity: "success" | "error";
+};
 
-export function SnackbarProvider({ children }) {
-  const [snackbar, setSnackbar] = useState({
+type SnackbarContextType = {
+  showSnackbar: (message: string, severity: "success" | "error") => void;
+};
+
+const SnackbarContext = createContext<SnackbarContextType | null>(null);
+
+export function SnackbarProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}): React.JSX.Element {
+  const [snackbar, setSnackbar] = useState<SnackbarState>({
     open: false,
     message: "",
     severity: "success",
   });
 
-  function showSnackbar(message, severity = "success") {
+  function showSnackbar(
+    message: string,
+    severity: "success" | "error" = "success",
+  ) {
     setSnackbar({
       open: true,
       message,
@@ -48,5 +66,10 @@ export function SnackbarProvider({ children }) {
 }
 
 export function useSnackbar() {
-  return useContext(SnackbarContext);
+  const context = useContext(SnackbarContext);
+
+  if (!context) {
+    throw new Error("useSnackbar must be used within a SnackbarProvider");
+  }
+  return context;
 }

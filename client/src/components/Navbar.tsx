@@ -1,14 +1,25 @@
-import React, { useState, useEffect, useContext } from "react";
 import { useNavigate, Link } from "react-router";
 import axios from "axios";
 
 // Contexts
-import AuthContext from "../context/AuthContext";
+import { useAuth } from "../context/AuthContext";
 import { useSnackbar } from "../context/SnackbarContext";
 
 // Styling
 import "./Navbar.css";
 import LiveTvIcon from "@mui/icons-material/LiveTv";
+
+// Types
+type LogoutData = {
+  success: boolean;
+  isAuthenticated: boolean;
+  successMsg?: string;
+  error?: string;
+};
+
+type AuthCheckData = {
+  isAuthenticated: boolean;
+};
 
 function Navbar() {
   const navigate = useNavigate();
@@ -20,21 +31,20 @@ function Navbar() {
   }
 
   // Conditional rendering for the login/logout buttons
-  const { isLogged, setIsLogged } = useContext(AuthContext);
+  const { isLogged, setIsLogged } = useAuth();
 
   // Handling logout
   async function handleLogout() {
     try {
-      const response = await axios.post(
+      const response = await axios.post<LogoutData>(
         "http://localhost:3000/logout",
         {},
         {
           withCredentials: true,
         },
       );
-      const isAuthenticated = response.data.isAuthenticated;
 
-      if (response.data.success) {
+      if (response.data.success && response.data.successMsg) {
         setIsLogged(false);
         showSnackbar(response.data.successMsg, "success");
         navigate("/");
@@ -46,9 +56,12 @@ function Navbar() {
 
   // Handling favorites list get request
   async function handleFavorites() {
-    const response = await axios.get("http://localhost:3000/auth/status", {
-      withCredentials: true,
-    });
+    const response = await axios.get<AuthCheckData>(
+      "http://localhost:3000/auth/status",
+      {
+        withCredentials: true,
+      },
+    );
 
     const isAuthenticated = response.data.isAuthenticated;
 
@@ -61,9 +74,12 @@ function Navbar() {
 
   // Handling watched list get request
   async function handleWatched() {
-    const response = await axios.get("http://localhost:3000/auth/status", {
-      withCredentials: true,
-    });
+    const response = await axios.get<AuthCheckData>(
+      "http://localhost:3000/auth/status",
+      {
+        withCredentials: true,
+      },
+    );
 
     const isAuthenticated = response.data.isAuthenticated;
 
@@ -76,9 +92,12 @@ function Navbar() {
 
   // Handling watching list get request
   async function handleWatching() {
-    const response = await axios.get("http://localhost:3000/auth/status", {
-      withCredentials: true,
-    });
+    const response = await axios.get<AuthCheckData>(
+      "http://localhost:3000/auth/status",
+      {
+        withCredentials: true,
+      },
+    );
 
     const isAuthenticated = response.data.isAuthenticated;
 
@@ -91,9 +110,12 @@ function Navbar() {
 
   // Handling watchlist get request
   async function handleWatchlist() {
-    const response = await axios.get("http://localhost:3000/auth/status", {
-      withCredentials: true,
-    });
+    const response = await axios.get<AuthCheckData>(
+      "http://localhost:3000/auth/status",
+      {
+        withCredentials: true,
+      },
+    );
 
     const isAuthenticated = response.data.isAuthenticated;
 

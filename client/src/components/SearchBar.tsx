@@ -1,17 +1,19 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router";
+
+// Styling
 import "./SearchBar.css";
 
-function SearchBar(props) {
+function SearchBar() {
   const navigate = useNavigate();
 
-  const [show, setShow] = useState("");
+  const [show, setShow] = useState<string>("");
 
-  function handleChange(event) {
+  function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
     setShow(event.target.value);
   }
 
-  function handleSubmit(event) {
+  function handleSubmit(event: React.SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
 
     navigate("/search?q=" + encodeURIComponent(show));

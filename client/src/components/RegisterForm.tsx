@@ -1,9 +1,9 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router";
 import axios from "axios";
 
 // Contexts
-import AuthContext from "../context/AuthContext";
+import { useAuth } from "../context/AuthContext";
 import { useSnackbar } from "../context/SnackbarContext";
 
 // Styling
@@ -14,27 +14,27 @@ function RegisterForm() {
 
   const { showSnackbar } = useSnackbar();
 
-  const { setIsLogged } = useContext(AuthContext);
+  const { setIsLogged } = useAuth();
 
   // States
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmedPassword, setConfirmedPassword] = useState("");
+  const [username, setUsername] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [confirmedPassword, setConfirmedPassword] = useState<string>("");
 
-  function handleUsername(event) {
+  function handleUsername(event: React.ChangeEvent<HTMLInputElement>) {
     setUsername(event.target.value);
   }
 
-  function handlePassword(event) {
+  function handlePassword(event: React.ChangeEvent<HTMLInputElement>) {
     setPassword(event.target.value);
   }
 
-  function handleConfirmPassword(event) {
+  function handleConfirmPassword(event: React.ChangeEvent<HTMLInputElement>) {
     setConfirmedPassword(event.target.value);
   }
 
   // Handling the register attempt
-  async function handleRegister(event) {
+  async function handleRegister(event: React.SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
 
     if (password === confirmedPassword) {
@@ -102,7 +102,7 @@ function RegisterForm() {
                       id="password"
                       placeholder="Enter your password"
                       required
-                      minLength="6"
+                      minLength={6}
                       onChange={handlePassword}
                     />
                   </div>
@@ -116,10 +116,10 @@ function RegisterForm() {
                     <input
                       type="password"
                       className="form-control"
-                      id="password"
+                      id="confirmPassword"
                       placeholder="Confirm your password"
                       required
-                      minLength="6"
+                      minLength={6}
                       onChange={handleConfirmPassword}
                     />
                   </div>
