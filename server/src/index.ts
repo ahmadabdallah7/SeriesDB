@@ -13,6 +13,13 @@ const app = express();
 const port = 3000;
 const saltRounds = 10;
 
+// Types
+type UserType = {
+  id: number;
+  username: string;
+  password: string;
+};
+
 // dotenv
 env.config();
 
@@ -109,37 +116,40 @@ app.post("/register", (req, res) => {
 
 // Handling the login post request
 app.post("/login", (req, res, next) => {
-  passport.authenticate("local", (err, user, info) => {
-    if (err) {
-      return next(err);
-    }
+  passport.authenticate(
+    "local",
+    (err: Error | null, user: UserType | false, info: { message: string }) => {
+      if (err) {
+        return next(err);
+      }
 
-    if (!user) {
-      return res.json({
-        success: false,
-        error: info.message,
-      });
-    }
+      if (!user) {
+        return res.json({
+          success: false,
+          error: info.message,
+        });
+      }
 
-    if (user) {
-      req.login(user, (err) => {
-        if (err) {
-          console.log(err);
-          return res.json({
-            success: false,
-            isAuthenticated: req.isAuthenticated(),
-            error: "Logging in failed.",
-          });
-        } else {
-          return res.json({
-            success: true,
-            isAuthenticated: req.isAuthenticated(),
-            successMsg: "You are now logged in!",
-          });
-        }
-      });
-    }
-  })(req, res, next);
+      if (user) {
+        req.login(user, (err) => {
+          if (err) {
+            console.log(err);
+            return res.json({
+              success: false,
+              isAuthenticated: req.isAuthenticated(),
+              error: "Logging in failed.",
+            });
+          } else {
+            return res.json({
+              success: true,
+              isAuthenticated: req.isAuthenticated(),
+              successMsg: "You are now logged in!",
+            });
+          }
+        });
+      }
+    },
+  )(req, res, next);
 });
 
 // Handling the logout post request
@@ -176,6 +186,13 @@ app.post("/logout", (req, res) => {
 
 // Handling adding a new show to the user's favorites
 app.post("/favorites/add", async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({
+      success: false,
+      error: "Unauthorized",
+    });
+  }
+
   const userId = req.user.id;
 
   try {
@@ -215,6 +232,13 @@ app.post("/favorites/add", async (req, res) => {
 
 // Handling the favorites list get request
 app.get("/favorites/list", async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({
+      success: false,
+      error: "Unauthorized",
+    });
+  }
+
   const userId = req.user.id;
   const result = await db.query(
     "SELECT * FROM favorites WHERE user_id = $1 ORDER BY show_name ASC",
@@ -238,6 +262,13 @@ app.get("/favorites/list", async (req, res) => {
 
 // Handling removing a show from the favorites list
 app.post("/favorites/remove", async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({
+      success: false,
+      error: "Unauthorized",
+    });
+  }
+
   const userId = req.user.id;
   const showId = req.body.showId;
   const showName = req.body.showName;
@@ -269,6 +300,13 @@ app.post("/favorites/remove", async (req, res) => {
 
 // Handling adding a new show to the user's watched list
 app.post("/watched/add", async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({
+      success: false,
+      error: "Unauthorized",
+    });
+  }
+
   const userId = req.user.id;
 
   try {
@@ -307,6 +345,13 @@ app.post("/watched/add", async (req, res) => {
 
 // Handling the watched list get request
 app.get("/watched/list", async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({
+      success: false,
+      error: "Unauthorized",
+    });
+  }
+
   const userId = req.user.id;
   const result = await db.query(
     "SELECT * FROM watched WHERE user_id = $1 ORDER BY show_name ASC",
@@ -330,6 +375,13 @@ app.get("/watched/list", async (req, res) => {
 
 // Handling removing a show from the watched list
 app.post("/watched/remove", async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({
+      success: false,
+      error: "Unauthorized",
+    });
+  }
+
   const userId = req.user.id;
   const showId = req.body.showId;
   const showName = req.body.showName;
@@ -360,6 +412,13 @@ app.post("/watched/remove", async (req, res) => {
 
 // Handling adding a new show to the user's watching list
 app.post("/watching/add", async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({
+      success: false,
+      error: "Unauthorized",
+    });
+  }
+
   const userId = req.user.id;
 
   try {
@@ -399,6 +458,13 @@ app.post("/watching/add", async (req, res) => {
 
 // Handling the watching list get request
 app.get("/watching/list", async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({
+      success: false,
+      error: "Unauthorized",
+    });
+  }
+
   const userId = req.user.id;
   const result = await db.query(
     "SELECT * FROM watching WHERE user_id = $1 ORDER BY show_name ASC",
@@ -422,6 +488,13 @@ app.get("/watching/list", async (req, res) => {
 
 // Handling removing a show from the watching list
 app.post("/watching/remove", async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({
+      success: false,
+      error: "Unauthorized",
+    });
+  }
+
   const userId = req.user.id;
   const showId = req.body.showId;
   const showName = req.body.showName;
@@ -453,6 +526,13 @@ app.post("/watching/remove", async (req, res) => {
 
 // Handling adding a new show to the user's watchlist
 app.post("/watchlist/add", async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({
+      success: false,
+      error: "Unauthorized",
+    });
+  }
+
   const userId = req.user.id;
 
   try {
@@ -492,6 +572,13 @@ app.post("/watchlist/add", async (req, res) => {
 
 // Handling the watchlist get request
 app.get("/watchlist/list", async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({
+      success: false,
+      error: "Unauthorized",
+    });
+  }
+
   const userId = req.user.id;
   const result = await db.query(
     "SELECT * FROM watchlist WHERE user_id = $1 ORDER BY show_name ASC",
@@ -515,6 +602,13 @@ app.get("/watchlist/list", async (req, res) => {
 
 // Handling removing a show from the watchlist
 app.post("/watchlist/remove", async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({
+      success: false,
+      error: "Unauthorized",
+    });
+  }
+
   const userId = req.user.id;
   const showId = req.body.showId;
   const showName = req.body.showName;
@@ -583,7 +677,7 @@ passport.serializeUser((user, cb) => {
 });
 
 // Retrieves the saved user data when needed
-passport.deserializeUser((user, cb) => {
+passport.deserializeUser((user: UserType, cb) => {
   cb(null, user);
 });
 
