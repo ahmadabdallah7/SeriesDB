@@ -74,7 +74,7 @@ The application uses an external public API to retrieve show information and pro
 ### Frontend
 
 - React
-- React Router
+- Next.js
 - Axios
 - Bootstrap 5
 - Material UI (MUI)
@@ -171,10 +171,10 @@ npm run server
 npm run client
 ```
 
-The frontend will typically run on:
+The frontend will run on:
 
 ```text
-http://localhost:5173
+http://localhost:3001
 ```
 
 The backend will run on:
