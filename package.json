@@ -2,7 +2,7 @@
   "name": "seriesdb",
   "private": true,
   "scripts": {
-    "client": "cd client && npm run dev",
+    "client": "cd next-client && npm run dev",
     "server": "cd server && nodemon src/index.ts"
   }
 }

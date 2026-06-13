@@ -121,7 +121,7 @@ DATABASE="SeriesDB"
 SESSION_SECRET="your_secret_key"
 ```
 
-### 4. ## Database Schema
+### 4. Database Schema
 
 The application uses PostgreSQL to store user accounts and personalized show lists.
 
@@ -162,19 +162,13 @@ Each list table is linked to a user through the `user_id` field.
 ### Start the backend server
 
 ```bash
-node index.js
-```
-
-or
-
-```bash
-nodemon index.js
+npm run server
 ```
 
 ### Start the frontend
 
 ```bash
-npm run dev
+npm run client
 ```
 
 The frontend will typically run on:
