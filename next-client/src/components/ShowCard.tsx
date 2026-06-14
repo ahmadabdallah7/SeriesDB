@@ -1,3 +1,5 @@
+"use client";
+
 import axios from "axios";
 import { useRouter } from "next/navigation";
 
@@ -32,6 +34,7 @@ import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 
 // Components
 import Tooltip from "@mui/material/Tooltip";
+import Image from "next/image";
 
 // Types
 type ShowCardProps = {
@@ -872,12 +875,14 @@ function ShowCard(props: ShowCardProps) {
     <div>
       <div className="serie">
         <div className="poster">
-          <img
+          <Image
             src={props.imageURL}
             alt={props.showName}
-            width="300px"
-            height="450px"
-            loading="lazy"
+            width={300}
+            height={450}
+            loading="eager"
+            placeholder="blur"
+            blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAiIGhlaWdodD0iMTAiIHhtbG5zPSJod…"
           />
         </div>
         <div className="details">
