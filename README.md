@@ -105,6 +105,10 @@ cd SeriesDB
 ### 2. Install dependencies
 
 ```bash
+cd server
+npm install
+
+cd next-client
 npm install
 ```
 
