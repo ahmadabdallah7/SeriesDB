@@ -1,18 +1,11 @@
-"use client";
-
-import { useEffect } from "react";
 import axios from "axios";
+import { cookies } from "next/headers";
 
-// Contexts
-import { useSnackbar } from "@/context/SnackbarContext";
-import { updateWatchlist } from "@/context/WatchlistContext";
-
-// Components
-import ShowCard from "@/components/ShowCard";
-import Box from "@mui/material/Box";
+// Clients
+import WatchlistClient from "@/components/WatchlistClient";
 
 // Types
-type show = {
+type Show = {
   show_id: number;
   show_name: string;
   status: string;
@@ -24,70 +17,49 @@ type show = {
 
 type WatchlistResponse = {
   success: boolean;
-  watchlistList: show[];
+  watchlistList: Show[];
   successMsg?: string;
   error?: string;
 };
 
 // The page
-function Watchlist() {
-  const { showSnackbar } = useSnackbar();
+async function Watchlist() {
+  let watchlistList: Show[] = [];
+  let error: string | null = null;
 
-  const { watchlistList, setWatchlistList } = updateWatchlist();
+  // getting the incoming browser cookie
+  const cookieStore = await cookies();
 
-  useEffect(() => {
-    async function fetchWatchlist() {
-      const response = await axios.get<WatchlistResponse>(
-        "http://localhost:3000/watchlist/list",
-        {
-          withCredentials: true,
+  // converting the cookie into a header string
+  const cookieHeader = cookieStore.toString();
+
+  try {
+    const response = await axios.get<WatchlistResponse>(
+      "http://localhost:3000/watchlist/list",
+      {
+        headers: {
+          Cookie: cookieHeader,
         },
-      );
-      const success = response.data.success;
+      },
+    );
+    const success = response.data.success;
 
-      if (success) {
-        const watchlistList = response.data.watchlistList;
-        setWatchlistList(watchlistList);
-      }
-
-      if (!success && response.data.error) {
-        showSnackbar(response.data.error, "error");
-      }
+    if (success) {
+      watchlistList = response.data.watchlistList;
     }
-    fetchWatchlist();
-  }, []);
+
+    if (!success && response.data.error) {
+      error = response.data.error;
+    }
+  } catch (e) {
+    error = "Failed to fetch watchlist.";
+  }
 
   return (
-    <div>
-      <Box
-        sx={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, 300px)",
-          justifyContent: "center",
-          gap: 3,
-          mt: 5,
-          px: 3,
-        }}
-      >
-        {watchlistList
-          ? watchlistList.map((show) => {
-              return (
-                <ShowCard
-                  key={show.show_id}
-                  showId={show.show_id}
-                  showName={show.show_name}
-                  status={show.status}
-                  genres={show.genres}
-                  rating={show.rating}
-                  summary={show.summary}
-                  imageURL={show.image_url}
-                  mode="watchlist"
-                />
-              );
-            })
-          : null}
-      </Box>
-    </div>
+    <WatchlistClient
+      initialList={watchlistList}
+      error={error}
+    ></WatchlistClient>
   );
 }
 

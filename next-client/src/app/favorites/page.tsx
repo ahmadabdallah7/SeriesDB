@@ -1,18 +1,11 @@
-"use client";
-
-import { useEffect } from "react";
 import axios from "axios";
+import { cookies } from "next/headers";
 
-// Contexts
-import { useSnackbar } from "@/context/SnackbarContext";
-import { updateFavorites } from "@/context/FavoritesContext";
-
-// Components
-import ShowCard from "@/components/ShowCard";
-import Box from "@mui/material/Box";
+// Client
+import FavoritesClient from "@/components/FavoritesClient";
 
 // Types
-type show = {
+type Show = {
   show_id: number;
   show_name: string;
   status: string;
@@ -24,70 +17,49 @@ type show = {
 
 type FavoritesResponse = {
   success: boolean;
-  favoritesList: show[];
+  favoritesList: Show[];
   successMsg?: string;
   error?: string;
 };
 
 // The page
-function Favorites() {
-  const { showSnackbar } = useSnackbar();
+async function Favorites() {
+  let favoritesList: Show[] = [];
+  let error: string | null = null;
 
-  const { favoritesList, setFavoritesList } = updateFavorites();
+  // getting the incoming browser cookie
+  const cookieStore = await cookies();
 
-  useEffect(() => {
-    async function fetchFavorites() {
-      const response = await axios.get<FavoritesResponse>(
-        "http://localhost:3000/favorites/list",
-        {
-          withCredentials: true,
+  // converting the cookie into a header string
+  const cookieHeader = cookieStore.toString();
+
+  try {
+    const response = await axios.get<FavoritesResponse>(
+      "http://localhost:3000/favorites/list",
+      {
+        headers: {
+          Cookie: cookieHeader,
         },
-      );
-      const success = response.data.success;
+      },
+    );
+    const success = response.data.success;
 
-      if (success) {
-        const favoritesList = response.data.favoritesList;
-        setFavoritesList(favoritesList);
-      }
-
-      if (!success && response.data.error) {
-        showSnackbar(response.data.error, "error");
-      }
+    if (success) {
+      favoritesList = response.data.favoritesList;
     }
-    fetchFavorites();
-  }, []);
+
+    if (!success && response.data.error) {
+      error = response.data.error;
+    }
+  } catch (e) {
+    error = "Failed to fetch favorites.";
+  }
 
   return (
-    <div>
-      <Box
-        sx={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, 300px)",
-          justifyContent: "center",
-          gap: 3,
-          mt: 5,
-          px: 3,
-        }}
-      >
-        {favoritesList
-          ? favoritesList.map((show) => {
-              return (
-                <ShowCard
-                  key={show.show_id}
-                  showId={show.show_id}
-                  showName={show.show_name}
-                  status={show.status}
-                  genres={show.genres}
-                  rating={show.rating}
-                  summary={show.summary}
-                  imageURL={show.image_url}
-                  mode="favorites"
-                />
-              );
-            })
-          : null}
-      </Box>
-    </div>
+    <FavoritesClient
+      initialList={favoritesList}
+      error={error}
+    ></FavoritesClient>
   );
 }
 

@@ -1,18 +1,11 @@
-"use client";
-
-import { useEffect } from "react";
 import axios from "axios";
+import { cookies } from "next/headers";
 
-// Contexts
-import { useSnackbar } from "@/context/SnackbarContext";
-import { updateWatching } from "@/context/WatchingContext";
-
-// Components
-import ShowCard from "@/components/ShowCard";
-import Box from "@mui/material/Box";
+// Client
+import WatchingClient from "@/components/WatchingClient";
 
 // Types
-type show = {
+type Show = {
   show_id: number;
   show_name: string;
   status: string;
@@ -24,70 +17,46 @@ type show = {
 
 type WatchingResponse = {
   success: boolean;
-  watchingList: show[];
+  watchingList: Show[];
   successMsg?: string;
   error?: string;
 };
 
 // The page
-function Watching() {
-  const { showSnackbar } = useSnackbar();
+async function Watching() {
+  let watchingList: Show[] = [];
+  let error: string | null = null;
 
-  const { watchingList, setWatchingList } = updateWatching();
+  // getting the incoming browser cookie
+  const cookieStore = await cookies();
 
-  useEffect(() => {
-    async function fetchWatching() {
-      const response = await axios.get<WatchingResponse>(
-        "http://localhost:3000/watching/list",
-        {
-          withCredentials: true,
+  // converting the cookie into a header string
+  const cookieHeader = cookieStore.toString();
+
+  try {
+    const response = await axios.get<WatchingResponse>(
+      "http://localhost:3000/watching/list",
+      {
+        headers: {
+          Cookie: cookieHeader,
         },
-      );
-      const success = response.data.success;
+      },
+    );
+    const success = response.data.success;
 
-      if (success) {
-        const watchingList = response.data.watchingList;
-        setWatchingList(watchingList);
-      }
-
-      if (!success && response.data.error) {
-        showSnackbar(response.data.error, "error");
-      }
+    if (success) {
+      watchingList = response.data.watchingList;
     }
-    fetchWatching();
-  }, []);
+
+    if (!success && response.data.error) {
+      error = response.data.error;
+    }
+  } catch (e) {
+    error = "Failed to fetch watching list";
+  }
 
   return (
-    <div>
-      <Box
-        sx={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, 300px)",
-          justifyContent: "center",
-          gap: 3,
-          mt: 5,
-          px: 3,
-        }}
-      >
-        {watchingList
-          ? watchingList.map((show) => {
-              return (
-                <ShowCard
-                  key={show.show_id}
-                  showId={show.show_id}
-                  showName={show.show_name}
-                  status={show.status}
-                  genres={show.genres}
-                  rating={show.rating}
-                  summary={show.summary}
-                  imageURL={show.image_url}
-                  mode="watching"
-                />
-              );
-            })
-          : null}
-      </Box>
-    </div>
+    <WatchingClient initialList={watchingList} error={error}></WatchingClient>
   );
 }
 
